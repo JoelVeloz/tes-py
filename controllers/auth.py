@@ -6,12 +6,10 @@ from configs.correos import enviar_correo_otp
 from configs.cifrado import encrypt_text, decrypt_text, read_key_from_file
 
 def registrar_usuario():
-    if 'logeado' in session:
-        # Se obtiene la cuenta del usuario
-        cuenta = verificar_usuario(session['usuario'])
-        # Muestra la pagina de inicio con la informacion de la cuenta
-        return render_template('index.html', account=cuenta)
-      # Verifica si el usuario existe en la base de datos
+    if 'verificado' in session:
+        if session['verificado']:
+            return redirect(url_for('home'))
+        
     if request.method == 'POST':
         # Create variables for easy access
         usuario = request.form['usuario']
@@ -47,11 +45,11 @@ def registrar_usuario():
     return render_template('register.html')
 
 def iniciar_sesion():
-    if 'logeado' in session:
-        # Se obtiene la cuenta del usuario
-        cuenta = verificar_usuario(session['usuario'])
-        # Muestra la pagina de inicio con la informacion de la cuenta
-        return render_template('index.html', account=cuenta)
+    
+    if 'verificado' in session:
+        if session['verificado']:
+            return redirect(url_for('home'))
+
     # Verifica si el usuario existe en la base de datos
     if request.method == 'POST' and 'usuario' in request.form and 'contrasena' in request.form:
         usuario = request.form['usuario']
@@ -114,6 +112,12 @@ def verificar_otp():
     return redirect(url_for('login'))
 
 def pag_home():
+    if 'verificado' in session:
+        print("a", session['verificado'])
+        if not session['verificado']:
+            print("b")
+            return redirect(url_for('otp'))
+    
     if 'logeado' in session:
         # Se obtiene la cuenta del usuario
         cuenta = verificar_usuario(session['usuario'])
